@@ -1,4 +1,6 @@
 ﻿using DataAccessLayer.Context;
+using DataAccessLayer.Repository;
+using DataAccessLayer.RepositoryContracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +20,7 @@ namespace DataAccessLayer
             {
                 options.UseMySQL(confiquraton.GetConnectionString("DefaultConnection")!);
             });
+            services.AddScoped<IProductsRepository,ProductRepository>();
 
             return services;
         }
