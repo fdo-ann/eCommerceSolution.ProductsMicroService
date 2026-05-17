@@ -33,7 +33,7 @@ namespace DataAccessLayer.Repository
             }
             _dbContext.Products.Remove(existinProduct);
             int affectedRowsCount = await _dbContext.SaveChangesAsync();
-            return affectedRowsCount > 0; // equals ot return true
+            return affectedRowsCount > 0; // equals to return true
             //return true;
         }
 
