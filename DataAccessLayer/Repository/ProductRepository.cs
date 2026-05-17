@@ -55,6 +55,16 @@ namespace DataAccessLayer.Repository
         public async Task<Product?> UpdateProduct(Product product)
         {
             Product? existingProduct = await _dbContext.Products.FirstOrDefaultAsync(temp=> temp.ProductID== product.ProductID);
+            if (existingProduct == null) {
+                return null;
+            }
+            existingProduct.ProductName = product.ProductName;
+            existingProduct.UnitPrice = product.UnitPrice;
+            existingProduct.QuantityInStock = product.QuantityInStock;
+            existingProduct.Category = product.Category;
+
+            await _dbContext.SaveChangesAsync();
+
             return existingProduct;
         }
     }
