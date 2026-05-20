@@ -49,29 +49,106 @@ namespace BusinessLogicLayer.Services
             return addedProductResponse;
         }
 
-        public Task<bool> DeleteProduct(Guid productID)
+        public async Task<bool> DeleteProduct(Guid productID)
         {
-            throw new NotImplementedException();
+            Product? existingProduct = await _productsRepository.GetProductByCondition(temp => temp.ProductID == productID);
+
+            if (existingProduct == null)
+            {
+                return false;
+            }
+
+            //Attempt to delete product
+            bool isDeleted = await _productsRepository.DeleteProduct(productID);
+            return isDeleted;
         }
 
-        public Task<ProductResponse?> GetProductByCondition(Expression<Func<Product, bool>> conditionExpression)
+        public async Task<ProductResponse?> GetProductByCondition(Expression<Func<Product, bool>> conditionExpression)
         {
-            throw new NotImplementedException();
+            Product? product = await _productsRepository.GetProductByCondition(conditionExpression);
+            if (product == null)
+            {
+                return null;
+            }
+
+            ProductResponse productResponse = new ProductResponse()
+            {
+                ProductID = product.ProductID,  
+                ProductName= product.ProductName,
+                Category = Enum.Parse<CategoryOptions>(product.Category),
+                UnitPrice= product.UnitPrice,
+                QuantityInStock = product.QuantityInStock
+            };
+
+            return productResponse;
         }
 
-        public Task<List<ProductResponse?>> GetProducts()
+        public async Task<List<ProductResponse?>> GetProducts()
         {
-            throw new NotImplementedException();
+            IEnumerable<Product> products = await _productsRepository.GetProducts();
+
+            //if (products == null)
+            //{
+            //    return null;
+            //}
+
+            List<ProductResponse> productResponseList = products.Select(product=> new ProductResponse()
+            {
+                ProductID = product.ProductID,
+                ProductName = product.ProductName,
+                Category = Enum.Parse<CategoryOptions>(product.Category),
+                UnitPrice = product.UnitPrice,
+                QuantityInStock = product.QuantityInStock
+            }).ToList();
+            return productResponseList;
         }
 
-        public Task<List<ProductResponse?>> GetProductsByCondition(Expression<Func<Product, bool>> conditionExpression)
+        public async Task<List<ProductResponse?>> GetProductsByCondition(Expression<Func<Product, bool>> conditionExpression)
         {
-            throw new NotImplementedException();
+            IEnumerable<Product?> products = await _productsRepository.GetProductsByCondition(conditionExpression);
+
+            List<ProductResponse> productResponseList = products.Select(product => new ProductResponse()
+            {
+                ProductID = product.ProductID,
+                ProductName = product.ProductName,
+                Category = Enum.Parse<CategoryOptions>(product.Category),
+                UnitPrice = product.UnitPrice,
+                QuantityInStock = product.QuantityInStock
+            }).ToList();
+            return productResponseList;
+
         }
 
-        public Task<ProductResponse?> UpdateProduct(ProductUpdateRequest productUpdateRequest)
+        public async Task<ProductResponse?> UpdateProduct(ProductUpdateRequest productUpdateRequest)
         {
-            throw new NotImplementedException();
+            Product? existingProduct = await _productsRepository.GetProductByCondition(temp => temp.ProductID == productUpdateRequest.ProductID);
+
+            if (existingProduct == null)
+            {
+                throw new ArgumentException("Invalid Product ID");
+            }
+
+            //Map from ProductUpdateRequest to Product type
+            Product product = new Product()
+            {
+                ProductName = productUpdateRequest.ProductName,
+                Category = productUpdateRequest.Category.ToString(),
+                UnitPrice = productUpdateRequest.UnitPrice,
+                QuantityInStock = productUpdateRequest.QuantityInStock
+            };
+
+            Product? updatedProduct = await _productsRepository.UpdateProduct(product);
+
+            ProductResponse productResponse = new ProductResponse()
+            {
+                ProductID = product.ProductID,
+                ProductName = product.ProductName,
+                Category = Enum.Parse<CategoryOptions>(product.Category),
+                UnitPrice = product.UnitPrice,
+                QuantityInStock = product.QuantityInStock
+            };
+
+            return productResponse;
         }
     }
 }
