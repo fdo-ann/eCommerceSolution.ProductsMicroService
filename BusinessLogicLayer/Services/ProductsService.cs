@@ -22,7 +22,7 @@ namespace BusinessLogicLayer.Services
             {
                 throw new ArgumentNullException(nameof(productAddRequest));
             }
-             //test
+            
             Product ProductInput = new Product()
             {
                 ProductName= productAddRequest.ProductName,
